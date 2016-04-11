@@ -1,0 +1,1 @@
+include ':synccore', ':app', ':xplat'
