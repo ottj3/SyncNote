@@ -1,11 +1,8 @@
 package insync.syncnote;
 
-import android.support.annotation.Nullable;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -14,9 +11,13 @@ public class SyncNoteCore {
 
     private static final SyncNoteCore INST = new SyncNoteCore();
     private Manager mgr;
+    private CoreConfig config;
+    private NoteParser parser;
 
     private SyncNoteCore() {
         mgr = new Manager();
+        config = new CoreConfig();
+        parser = new NoteParser();
     }
 
     public static SyncNoteCore getInst() {
@@ -27,28 +28,34 @@ public class SyncNoteCore {
         return mgr;
     }
 
-    private static final String server = "http://www.tcnj.edu/~ottj3/";
+    public CoreConfig getConfig() {
+        return config;
+    }
+
+    public NoteParser getParser() {
+        return parser;
+    }
 
     public static void uploadText(String key, String text) {
         try {
-            String req = server + "note.php";
+            String req = Constants.SERVER + "note.php";
 
             // for uploading via GET
-//            req = req.concat("?key=" + URLEncoder.encode(key, "UTF-8")
-//                    + "&message=" + URLEncoder.encode(text, "UTF-8"));
-//            URL url = new URL(req);
-//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            // for uploading via POST
+            req = req.concat("?key=" + URLEncoder.encode(key, "UTF-8")
+                    + "&message=" + URLEncoder.encode(text, "UTF-8"));
             URL url = new URL(req);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            conn.setRequestMethod("POST");
-            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-            writer.write("key=" + URLEncoder.encode(key, "UTF-8") +
-                    "&message=" + URLEncoder.encode(text, "UTF-8"));
-            writer.flush();
-            writer.close();
+
+            // for uploading via POST
+//            URL url = new URL(req);
+//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//            conn.setDoOutput(true);
+//            conn.setRequestMethod("POST");
+//            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+//            writer.write("key=" + URLEncoder.encode(key, "UTF-8") +
+//                    "&message=" + URLEncoder.encode(text, "UTF-8"));
+//            writer.flush();
+//            writer.close();
 
 
 //            String line;
@@ -63,9 +70,8 @@ public class SyncNoteCore {
         }
     }
 
-    @Nullable
     public static String downloadText(String key) {
-        String req = server.concat("note.php").concat("?key=").concat(key);
+        String req = Constants.SERVER.concat("note.php").concat("?key=").concat(key);
         StringBuilder res = new StringBuilder();
         try {
             URL url = new URL(req);
