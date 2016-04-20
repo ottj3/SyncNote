@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".SyncNoteCore">
+    <item
+        android:id="@+id/action_menu"
+        android:title="Menu"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/sub_one"
+                android:title="Sub-menu item one" />
+            <item
+                android:id="@+id/sub_two"
+                android:title="Sub-menu item two" />
+        </menu>
+    </item>
+</menu>
