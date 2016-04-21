@@ -1,7 +1,5 @@
 package insync.syncnote;
 
-import android.support.annotation.Nullable;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -16,25 +14,29 @@ public class Manager {
         this.notes = new HashMap<>();
     }
 
-    public boolean hasUpdates(long since) {
-        return lastModifiedTime > since;
+    public long getLastModifiedTime() {
+        return lastModifiedTime;
+    }
+
+    private void markDirty() {
+        lastModifiedTime = System.currentTimeMillis();
     }
 
     public List<Note> getAllNotes() {
         return new ArrayList<Note>(notes.values());
     }
 
-    @Nullable
     public Note addNote(Note note) {
         if (note == null) return null;
-        if (notes.containsKey(note.getId())) {
-            return null; // should not overwrite notes?
-        }
-        lastModifiedTime = System.currentTimeMillis();
+        markDirty();
         return notes.put(note.getId(), note);
     }
 
-    @Nullable
+    public boolean remove(String id) {
+        markDirty();
+        return notes.remove(id) != null;
+    }
+
     public Note get(String id) {
         return notes.get(id);
     }
