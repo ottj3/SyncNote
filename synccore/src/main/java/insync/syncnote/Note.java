@@ -6,7 +6,7 @@ public class Note {
     private String text;
 
     public Note(String id, String text) {
-        if (id == null || id.equals("")) {
+        if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("note cannot have empty name");
         }
         this.id = id;

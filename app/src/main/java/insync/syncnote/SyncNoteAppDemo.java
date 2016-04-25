@@ -7,6 +7,9 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 
+import insync.syncnote.exceptions.RequestForbiddenException;
+import insync.syncnote.exceptions.RequestInvalidException;
+
 public class SyncNoteAppDemo extends AppCompatActivity {
 
     @Override
@@ -29,7 +32,13 @@ public class SyncNoteAppDemo extends AppCompatActivity {
         if (syncKey == null || syncText == null) return;
         String text = syncText.getText().toString();
         String key = syncKey.getText().toString();
-        SyncNoteCore.uploadText(key, text);
+        try {
+            HTTPTasks.uploadText(key, text);
+        } catch (RequestForbiddenException e) {
+            e.printStackTrace();
+        } catch (RequestInvalidException e) {
+            e.printStackTrace();
+        }
     }
 
     public void clickDown(View view) {
@@ -37,7 +46,14 @@ public class SyncNoteAppDemo extends AppCompatActivity {
         EditText syncKey = (EditText) findViewById(R.id.syncKey);
         if (syncKey == null || syncText == null) return;
         String key = syncKey.getText().toString();
-        String text = SyncNoteCore.downloadText(key);
+        String text = null;
+        try {
+            text = HTTPTasks.downloadText(key);
+        } catch (RequestForbiddenException e) {
+            e.printStackTrace();
+        } catch (RequestInvalidException e) {
+            e.printStackTrace();
+        }
         syncText.getText().clear();
         syncText.getText().append(text);
     }
