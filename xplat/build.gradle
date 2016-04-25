@@ -1,7 +1,5 @@
 apply plugin: 'java'
 
-sourceSets {
-    main {
-        java.srcDirs = ['src/main/java', new File(project(':synccore').rootDir, "synccore/src/main/java")]
-    }
+dependencies {
+    compile project(':synccore')
 }

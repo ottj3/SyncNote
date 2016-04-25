@@ -10,6 +10,6 @@ public class CoreConfig {
     }
 
     public void setAuthToken(String authToken) {
-        this.authToken = authToken;
+        this.authToken = authToken.trim();
     }
 }

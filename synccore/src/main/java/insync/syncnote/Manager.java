@@ -23,11 +23,11 @@ public class Manager {
     }
 
     public List<Note> getAllNotes() {
-        return new ArrayList<Note>(notes.values());
+        return new ArrayList<>(notes.values());
     }
 
     public Note addNote(Note note) {
-        if (note == null) return null;
+        if (note == null || note.getId().isEmpty()) return null;
         markDirty();
         return notes.put(note.getId(), note);
     }
