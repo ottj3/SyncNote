@@ -17,10 +17,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity android:name="insync.syncnote.MainActivity2">-->
-            <!--<intent-filter>-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
+        <activity android:name="insync.syncnote.MainActivity2">
+        </activity>
+        <activity android:name="insync.syncnote.Notes">
+        </activity>
     </application>
 
 </manifest>

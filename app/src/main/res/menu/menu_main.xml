@@ -6,14 +6,5 @@
     <item
         android:id="@+id/action_menu"
         android:title="Menu"
-        app:showAsAction="always">
-        <menu>
-            <item
-                android:id="@+id/sub_one"
-                android:title="Sub-menu item one" />
-            <item
-                android:id="@+id/sub_two"
-                android:title="Sub-menu item two" />
-        </menu>
-    </item>
+        app:showAsAction="always"/>
 </menu>

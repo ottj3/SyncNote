@@ -1,10 +1,13 @@
 package insync.syncnote;
 
+import android.content.Intent;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import insync.syncnote.exceptions.RequestForbiddenException;
@@ -24,6 +27,14 @@ public class SyncNoteAppDemo extends AppCompatActivity {
     {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        Intent intent = new Intent(this, MainActivity2.class);
+        this.startActivity(intent);
+        return super.onOptionsItemSelected(item);
     }
 
     public void clickUp(View view) {
@@ -57,4 +68,5 @@ public class SyncNoteAppDemo extends AppCompatActivity {
         syncText.getText().clear();
         syncText.getText().append(text);
     }
+
 }
