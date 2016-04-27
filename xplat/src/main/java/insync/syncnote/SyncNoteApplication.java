@@ -1,251 +1,128 @@
 package insync.syncnote;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+import com.google.gson.Gson;
+
 import java.awt.EventQueue;
-import java.awt.GridLayout;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.Timer;
-import javax.swing.WindowConstants;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+public class SyncNoteApplication {
 
-import insync.syncnote.exceptions.InvalidNotesFileException;
-import insync.syncnote.exceptions.RequestForbiddenException;
-import insync.syncnote.exceptions.RequestInvalidException;
-
-public class SyncNoteApplication extends JFrame {
-
-    private JEditorPane textEditorPane;
-    private JTextPane noteIdPane;
-    private boolean docChanged;
-    private Timer updateTask;
-
-    public SyncNoteApplication() {
-        init();
-    }
-
-    private void init() {
-        JButton uploadButton = new JButton("U");
-        JButton downloadButton = new JButton("D");
-        uploadButton.addActionListener(e -> upload());
-        downloadButton.addActionListener(e -> download());
-
-        JButton settingsButton = new JButton("L");
-        JButton deleteButton = new JButton("X");
-        settingsButton.addActionListener(e -> openSettings());
-        deleteButton.addActionListener(e -> deleteNote());
-
-        textEditorPane = new JEditorPane();
-        noteIdPane = new JTextPane();
-        noteIdPane.setBackground(Color.GRAY);
-
-        textEditorPane.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                docChanged = true;
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                docChanged = true;
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                docChanged = true;
-            }
-        });
-
-        updateTask = new Timer(100, e -> {
-            if (docChanged) {
-                if (!noteIdPane.getText().isEmpty()) {
-                    saveCurrentNote();
-                }
-            }
-        });
-
-        JButton prevNote = new JButton("<");
-        JButton nextNote = new JButton(">");
-        prevNote.addActionListener(e -> {
-            saveCurrentNote();
-            List<Note> notes = SyncNoteCore.getInst().getManager().getAllNotes();
-            if (notes.size() > 1) {
-                prevNote.setForeground(Color.BLACK);
-                nextNote.setForeground(Color.BLACK);
-                Note prev = null;
-                String curr = noteIdPane.getText();
-                for (Note n : notes) {
-                    if (n.getId().equals(curr)) {
-                        if (prev == null) {
-                            prevNote.setForeground(Color.RED);
-                            break;
-                        } else {
-                            noteIdPane.setText(prev.getId());
-                            textEditorPane.setText(prev.getText());
-                            break;
-                        }
-                    }
-                    prev = n;
-                }
-            } else {
-                prevNote.setForeground(Color.RED);
-                nextNote.setForeground(Color.RED);
-            }
-        });
-        nextNote.addActionListener(e -> {
-            saveCurrentNote();
-            List<Note> notes = SyncNoteCore.getInst().getManager().getAllNotes();
-            if (notes.size() > 1) {
-                prevNote.setForeground(Color.BLACK);
-                nextNote.setForeground(Color.BLACK);
-                boolean next = false;
-                String curr = noteIdPane.getText();
-                for (Note n : notes) {
-                    if (!next) {
-                        if (n.getId().equals(curr)) {
-                            next = true;
-                        }
-                    } else {
-                        noteIdPane.setText(n.getId());
-                        textEditorPane.setText(n.getText());
-                        next = false;
-                        break;
-                    }
-                }
-                if (next) {
-                    nextNote.setForeground(Color.RED);
-                }
-            } else {
-                prevNote.setForeground(Color.RED);
-                nextNote.setForeground(Color.RED);
-            }
-        });
-
-        JComponent[] buttons = new JComponent[] {
-                uploadButton, downloadButton,
-                prevNote, nextNote,
-                settingsButton, deleteButton
-        };
-
-        setUndecorated(true);
-
-        setupUI(buttons, noteIdPane, textEditorPane);
-
-        setTitle("SyncNote");
-        setSize(300, 200);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    }
-
-    private void saveCurrentNote() {
-        Note current = SyncNoteCore.getInst().getManager().get(noteIdPane.getText());
-        if (current != null) {
-            current.setText(textEditorPane.getText());
-        } else {
-            SyncNoteCore.getInst().getManager()
-                    .addNote(new Note(noteIdPane.getText(), textEditorPane.getText()));
+    private final Object lock = new Object();
+    public void notifyLock() {
+        synchronized (lock) {
+            // this notifies the wait() below, in case the caller of this method
+            // was the last window to close (which will get checked anyway)
+            lock.notify();
         }
-    }
-
-    private void setupUI(JComponent[] topRow, JEditorPane noteId, JEditorPane textBox) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(1, topRow.length));
-        for (JComponent component : topRow) {
-            panel.add(component);
-        }
-
-        getContentPane().add(panel, BorderLayout.NORTH);
-        getContentPane().add(textBox, BorderLayout.CENTER);
-        getContentPane().add(noteId, BorderLayout.SOUTH);
-
-
-        this.pack();
-    }
-
-    private void upload() {
-        if (!noteIdPane.getText().isEmpty()) {
-            SyncNoteCore.getInst().getManager().addNote(new Note(noteIdPane.getText(), textEditorPane.getText()));
-        }
-
-        String key = SyncNoteCore.getInst().getConfig().getAuthToken();
-        String text = SyncNoteCore.getInst().getParser().encode();
-        try {
-            HTTPTasks.uploadText(key, text);
-        } catch (RequestForbiddenException e) {
-            JOptionPane.showMessageDialog(this, "Couldn't upload your note because your session "
-                    + "key is invalid. Try logging back in.",
-                    "Error Uploading", JOptionPane.ERROR_MESSAGE);
-        } catch (RequestInvalidException e) {
-            JOptionPane.showMessageDialog(this, "You need to login to do that.",
-                    "Error Uploading", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    public void triggerDownload() {
-        download();
-    }
-
-    private void download() {
-        String key = SyncNoteCore.getInst().getConfig().getAuthToken();
-        try {
-            String res = HTTPTasks.downloadText(key);
-
-            SyncNoteCore.getInst().getParser().decode(res);
-            List<Note> notes = SyncNoteCore.getInst().getManager().getAllNotes();
-            if (notes.isEmpty()) {
-                textEditorPane.setText("You have no notes :(");
-            } else {
-                textEditorPane.setText(notes.get(0).getText());
-                noteIdPane.setText(notes.get(0).getId());
-            }
-        } catch (RequestForbiddenException e) {
-            JOptionPane.showMessageDialog(this, "Couldn't download your note because your session "
-                            + "key is invalid. Try logging back in.",
-                    "Error Downloading", JOptionPane.ERROR_MESSAGE);
-        } catch (RequestInvalidException e) {
-            JOptionPane.showMessageDialog(this, "You need to login to do that.",
-                    "Error Downloading", JOptionPane.ERROR_MESSAGE);
-        } catch (InvalidNotesFileException e) {
-            JOptionPane.showMessageDialog(this, "Your notes file was corrupt. Try reuploading your notes.",
-                    "Error Downloading", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void deleteNote() {
-        String current = noteIdPane.getText();
-        if (!current.isEmpty()) {
-            SyncNoteCore.getInst().getManager().remove(current);
-        }
-        List<Note> remaining = SyncNoteCore.getInst().getManager().getAllNotes();
-        if (!remaining.isEmpty()) {
-            Note next = remaining.get(0);
-            noteIdPane.setText(next.getId());
-            textEditorPane.setText(next.getText());
-        }
-    }
-
-    private void openSettings() {
-        // TODO full settings menu, not just login
-        EventQueue.invokeLater(() -> {
-            LoginDialog login = new LoginDialog(this);
-            login.setVisible(true);
-        });
     }
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            SyncNoteApplication main = new SyncNoteApplication();
-            main.setVisible(true);
-            main.updateTask.start();
+        // create main instance of our application
+        SyncNoteApplication main = new SyncNoteApplication();
+        // load config from a settings file, or create it if it doesn't exist
+        main.loadConfig("settings.json");
+
+        // create the default note window. this will always show up, even if you have no notes
+        NoteWindow defaultWindow = new NoteWindow(main);
+        EventQueue.invokeLater(() -> defaultWindow.setVisible(true));
+        main.activeWindows.add(defaultWindow);
+
+        CoreConfig config = SyncNoteCore.getInst().getConfig();
+        // if the user hasn't specifically chosen to remain offline, and isn't logged in,
+        // show the login dialog for them
+        if (!config.isOffline() && config.getAuthToken().isEmpty()) {
+            // first time login
+            LoginDialog login = new LoginDialog(main);
+            EventQueue.invokeLater(() -> login.setVisible(true));
+        }
+
+        // create a lock & thread to wait indefinitely until all windows (notes & settings) close
+        // only once the user closes all windows can the application exit
+        Thread t = new Thread(() -> {
+            //System.out.println("Running thread");
+            synchronized (main.lock) {
+                while (!main.activeWindows.isEmpty() || (main.settingsWindow != null)) {
+                    try {
+                        // if there are still open windows, wait until we get a notify() from above
+                        //System.out.println("Wait starting");
+                        main.lock.wait();
+                        //System.out.println("Wait finished");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                //System.out.println("Ran thread");
+            }
         });
+        t.start();
+        try {
+            // yield to our waiting thread. this thread will merge with it and not run anything else
+            // until that thread finishes, which only happens when all windows close
+            //System.out.println("Joining thread.");
+            t.join();
+            //System.out.println("Joined thread finished.");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // before exiting, save any changes to config
+        // (notes should save when each individual window closes)
+        main.saveConfig("settings.json");
+        System.exit(0);
+    }
+
+    final List<NoteWindow> activeWindows = new ArrayList<>();
+    SettingsWindow settingsWindow = null;
+
+    public void saveConfig(String fileName) {
+        File configFile = new File(fileName);
+        Gson gson = new Gson();
+        // write the current configuration state out to the file
+        try (FileWriter writer = new FileWriter(configFile)) {
+            String out = gson.toJson(SyncNoteCore.getInst().getConfig());
+            writer.write(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadConfig(String fileName) {
+        File configFile = new File(fileName);
+        Gson gson = new Gson();
+        try {
+            if (configFile.exists()) {
+                // if the file already exists, load settings from there
+                FileInputStream fis = new FileInputStream(configFile);
+                InputStreamReader reader = new InputStreamReader(fis);
+                SyncNoteCore.getInst().setConfig(gson.fromJson(reader, CoreConfig.class));
+                fis.close();
+            } else {
+                // otherwise, load it from the internal resource
+                InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
+                if (is == null) {
+                    System.out.println("Default config not found in jar!");
+                    return;
+                }
+                // and then write it out to the filesystem for future startups
+                FileOutputStream fos = new FileOutputStream(configFile);
+                byte[] buf = new byte[8192];
+                int length;
+                while ((length = is.read(buf)) > 0) {
+                    fos.write(buf, 0, length);
+                }
+                fos.close();
+                is.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

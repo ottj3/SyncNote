@@ -37,6 +37,10 @@ public class Manager {
         return notes.remove(id) != null;
     }
 
+    public void removeAll() {
+        notes = new HashMap<>();
+    }
+
     public Note get(String id) {
         return notes.get(id);
     }

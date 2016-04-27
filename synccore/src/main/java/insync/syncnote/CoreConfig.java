@@ -1,9 +1,29 @@
 package insync.syncnote;
 
+import java.util.List;
+
 public class CoreConfig {
 
+    private String authToken = "";
+    private boolean offline;
+    private List<String> openNotes;
 
-    private String authToken;
+
+    public boolean isOffline() {
+        return offline;
+    }
+
+    public void setOffline(boolean offline) {
+        this.offline = offline;
+    }
+
+    public List<String> getOpenNotes() {
+        return openNotes;
+    }
+
+    public void setOpenNotes(List<String> openNotes) {
+        this.openNotes = openNotes;
+    }
 
     public String getAuthToken() {
         return authToken;

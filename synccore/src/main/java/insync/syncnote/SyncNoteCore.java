@@ -25,6 +25,10 @@ public class SyncNoteCore {
         return config;
     }
 
+    public void setConfig(CoreConfig config) {
+        this.config = config;
+    }
+
     public NoteParser getParser() {
         return parser;
     }

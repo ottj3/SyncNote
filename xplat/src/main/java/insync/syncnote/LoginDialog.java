@@ -33,7 +33,7 @@ public class LoginDialog extends JDialog {
 
     JButton btnLogin = new JButton("Login");
     JButton btnReg = new JButton("Register");
-    JButton btnCancel = new JButton("Cancel");
+    JButton btnOffline = new JButton("Stay Offline");
 
     public LoginDialog(SyncNoteApplication parent) {
         this.parent = parent;
@@ -63,7 +63,7 @@ public class LoginDialog extends JDialog {
                         SyncNoteCore.getInst().getConfig().setAuthToken(token);
                         titleText.setForeground(Color.GREEN);
                         titleText.setText("Logged in successfully!");
-                        parent.triggerDownload();
+                        parent.activeWindows.forEach(NoteWindow::triggerDownload);
                         closeGracefully();
                     }
                 });
@@ -101,7 +101,7 @@ public class LoginDialog extends JDialog {
                         titleText.setForeground(Color.GREEN);
                         titleText.setText("Registered and logged in successfully!");
                         closeGracefully();
-                        parent.triggerDownload();
+                        parent.activeWindows.forEach(NoteWindow::triggerDownload);
                     }
                 });
             } else {
@@ -109,7 +109,8 @@ public class LoginDialog extends JDialog {
             }
         });
 
-        btnCancel.addActionListener(e3 -> {
+        btnOffline.addActionListener(e3 -> {
+            SyncNoteCore.getInst().getConfig().setOffline(true);
             this.setVisible(false);
             this.dispose();
         });
@@ -118,7 +119,7 @@ public class LoginDialog extends JDialog {
     private void closeGracefully() {
         btnLogin.setEnabled(false);
         btnReg.setEnabled(false);
-        btnCancel.setEnabled(false);
+        btnOffline.setEnabled(false);
         Timer timer = new Timer(750, e -> {
             this.setVisible(false);
             this.dispose();
@@ -147,7 +148,7 @@ public class LoginDialog extends JDialog {
         JPanel buttons = new JPanel(new GridLayout(1, 3, 5, 5));
         buttons.add(btnLogin);
         buttons.add(btnReg);
-        buttons.add(btnCancel);
+        buttons.add(btnOffline);
         box.add(buttons, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(btnLogin);
@@ -155,7 +156,7 @@ public class LoginDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().add(box);
         setPreferredSize(new Dimension(400, 150));
-        setLocation(parent.getLocation());
+        setLocation(parent.activeWindows.get(0).getLocation());
         pack();
     }
 

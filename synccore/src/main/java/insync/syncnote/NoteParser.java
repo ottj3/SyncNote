@@ -23,6 +23,9 @@ public class NoteParser {
         Note[] notes;
         try {
             notes = gson.fromJson(json, Note[].class);
+            if (notes == null) {
+                return;
+            }
             for (Note n : notes) {
                 target.addNote(n);
             }
