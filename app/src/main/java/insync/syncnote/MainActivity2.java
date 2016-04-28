@@ -11,7 +11,7 @@ package insync.syncnote;
         import android.widget.Toast;
 
 public class MainActivity2 extends AppCompatActivity {
-    String[] menuItemsArray = {"Account", "Notes", "TBD"};
+    String[] menuItemsArray = {"Account", "Notes", "Settings", "TBD"};
     ListView mListView;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -35,9 +35,9 @@ public class MainActivity2 extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity2.this, Notes.class);
                     MainActivity2.this.startActivity(intent);
                 }
-                else
+                if (item == "Settings")
                 {
-                    Toast.makeText(getBaseContext(), item, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), "Blah", Toast.LENGTH_SHORT).show();
                 }
             }
         });

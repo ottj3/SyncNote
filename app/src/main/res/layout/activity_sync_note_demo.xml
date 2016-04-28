@@ -7,53 +7,48 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/yellow"
     tools:context=".SyncNoteAppDemo">
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Upload"
-        android:id="@+id/syncUp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:onClick="clickUp"/>
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Upload"-->
+        <!--android:id="@+id/syncUp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:onClick="clickUp"/>-->
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Download"
-        android:id="@+id/syncDown"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:onClick="clickDown"/>
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Key"
-        android:id="@+id/syncKey"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/syncUp"
-        android:layout_toLeftOf="@+id/syncDown"
-        android:layout_toEndOf="@+id/syncUp"
-        android:layout_toStartOf="@+id/syncDown"
-        android:layout_alignTop="@+id/syncUp"
-        android:autoText="false" />
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Download"-->
+        <!--android:id="@+id/syncDown"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:onClick="clickDown"/>-->
 
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:id="@+id/syncText"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="false"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/syncUp" />
+        android:text="571e5d385897f"
+        android:id="@+id/syncKey"
+        android:layout_alignParentBottom="true"/>
+
+    <EditText
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:text="Hello World!"
+    android:id="@+id/syncText"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentRight="false"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentEnd="false"
+    android:layout_alignParentTop="true"
+    android:layout_above="@+id/syncUp" />
 
 </RelativeLayout>
 

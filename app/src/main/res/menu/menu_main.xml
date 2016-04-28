@@ -4,7 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".SyncNoteCore">
     <item
+        android:id="@+id/syncUp"
+        android:title="Upload"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/syncDown"
+        android:title="Download"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/action_menu"
-        android:title="Menu"
+        android:title="Settings"
         app:showAsAction="always"/>
 </menu>
