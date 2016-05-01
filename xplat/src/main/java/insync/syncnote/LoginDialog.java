@@ -156,7 +156,7 @@ public class LoginDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().add(box);
         setPreferredSize(new Dimension(400, 150));
-        setLocation(parent.activeWindows.get(0).getLocation());
+        //setLocation(parent.activeWindows.get(0).getLocation());
         pack();
     }
 

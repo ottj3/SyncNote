@@ -13,6 +13,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import insync.syncnote.exceptions.InvalidNotesFileException;
+import insync.syncnote.exceptions.RequestForbiddenException;
+import insync.syncnote.exceptions.RequestInvalidException;
+
 public class SyncNoteApplication {
 
     private final Object lock = new Object();
@@ -30,11 +37,6 @@ public class SyncNoteApplication {
         // load config from a settings file, or create it if it doesn't exist
         main.loadConfig("settings.json");
 
-        // create the default note window. this will always show up, even if you have no notes
-        NoteWindow defaultWindow = new NoteWindow(main);
-        EventQueue.invokeLater(() -> defaultWindow.setVisible(true));
-        main.activeWindows.add(defaultWindow);
-
         CoreConfig config = SyncNoteCore.getInst().getConfig();
         // if the user hasn't specifically chosen to remain offline, and isn't logged in,
         // show the login dialog for them
@@ -42,6 +44,57 @@ public class SyncNoteApplication {
             // first time login
             LoginDialog login = new LoginDialog(main);
             EventQueue.invokeLater(() -> login.setVisible(true));
+        } else if (!config.getAuthToken().isEmpty()) {
+            // if they ARE logged in already, fetch their notes
+            try {
+                Thread dl = new Thread(() -> {
+                    String key = config.getAuthToken();
+                    try {
+                        String json = HTTPTasks.downloadText(key);
+                        SyncNoteCore.getInst().getParser().decode(json);
+                    } catch (RequestForbiddenException e) {
+                        // they got logged out, log back in
+                        LoginDialog login = new LoginDialog(main);
+                        EventQueue.invokeLater(() -> login.setVisible(true));
+                    } catch (InvalidNotesFileException e2) {
+                        JOptionPane.showMessageDialog(new JFrame(), "Tried to get your notes from "
+                                + "the server, but the file was corrupted.",
+                                "Error Downloading", JOptionPane.ERROR_MESSAGE);
+                    } catch (RequestInvalidException ignored) {
+                    }
+                });
+                dl.start();
+                dl.join();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // if the user had notes open last time they quit, re-open those all in windows
+        if (!config.getOpenNotes().isEmpty()) {
+            List<String> setLater = new ArrayList<>();
+            config.getOpenNotes().forEach(s -> {
+                Note note = SyncNoteCore.getInst().getManager().get(s);
+                if (note == null) {
+                    // had a note open that's gone now, remove it
+                    return;
+                }
+                setLater.add(s);
+                NoteWindow window = new NoteWindow(main);
+                window.showNote(note);
+                EventQueue.invokeLater(() -> window.setVisible(true));
+                main.activeWindows.add(window);
+            });
+            config.setOpenNotes(setLater);
+        }
+        // if we failed to create windows above (if we got logged out or notes are missing,
+        // for example), then make the default window anyway
+        if (main.activeWindows.isEmpty()) {
+            // create the default note window. this will always show up, even if you have no notes,
+            // or no open notes
+            NoteWindow defaultWindow = new NoteWindow(main);
+            EventQueue.invokeLater(() -> defaultWindow.setVisible(true));
+            main.activeWindows.add(defaultWindow);
         }
 
         // create a lock & thread to wait indefinitely until all windows (notes & settings) close
