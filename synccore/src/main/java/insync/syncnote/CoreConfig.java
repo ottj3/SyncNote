@@ -1,7 +1,11 @@
 package insync.syncnote;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stores settings for SyncNote. Everything pretty self-explanatory here.
+ */
 public class CoreConfig {
 
     private String authToken = "";
@@ -18,6 +22,7 @@ public class CoreConfig {
     }
 
     public List<String> getOpenNotes() {
+        if (openNotes == null) openNotes = new ArrayList<>();
         return openNotes;
     }
 

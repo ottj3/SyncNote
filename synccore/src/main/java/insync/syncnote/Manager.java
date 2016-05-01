@@ -5,6 +5,11 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Simple Map wrapper for Note management.
+ * Everything should be self-explanatory, since it just wraps a Map.
+ * Except lastModifiedTime, which isn't used yet. TODO features
+ */
 public class Manager {
 
     private Map<String, Note>  notes;
