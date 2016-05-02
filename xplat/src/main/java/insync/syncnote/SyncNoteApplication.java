@@ -52,7 +52,8 @@ public class SyncNoteApplication {
                     } catch (RequestForbiddenException e) {
                         // they got logged out, log back in
                         LoginDialog login = new LoginDialog(main);
-                        EventQueue.invokeLater(() -> login.setVisible(true));
+                        login.setModal(true);
+                        login.setVisible(true);
                     } catch (InvalidNotesFileException e2) {
                         JOptionPane.showMessageDialog(new JFrame(), "Tried to get your notes from "
                                         + "the server, but the file was corrupted.",
@@ -76,7 +77,7 @@ public class SyncNoteApplication {
                 Note note = SyncNoteCore.getInst().getManager().get(s);
                 if (note == null) {
                     // had a note open that's gone now, remove it
-                    return;
+                    continue;
                 }
                 setLater.add(s);
                 NoteWindow window = new NoteWindow(main);

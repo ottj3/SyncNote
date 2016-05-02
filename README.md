@@ -35,7 +35,7 @@ If you wish to compile on a standalone installation of the SDK, this can be acco
 The apk file should be in the ```app/build``` folder, but will only run on devices (or an emulator) in developer mode, as it will not be signed.
 
 ### iOS
-Import the ```SyncNote.xcodeproj``` file from the ```iOS``` file into XCode.
+Import the ```SyncNote.xcodeproj``` file from the ```iOS``` folder into XCode.
 
 ## Server
 The server-side which handles users and stores notes is written completely in a few php scripts. If you wish to test or develop these yourself, you will need any HTTP server with PHP installed and configured, or run the php interpreter in server mode (```php -S localhost:80```, for example).

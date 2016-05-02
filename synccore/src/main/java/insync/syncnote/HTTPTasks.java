@@ -128,7 +128,8 @@ public final class HTTPTasks {
             }
             return ret.toString();
         } catch (IOException e) {
-            e.printStackTrace(); // TODO um
+            e.printStackTrace(); // TODO if you are reading this, it's probably because the server
+                                 // is down or missing or moved or something. or your internet is.
         }
         return null;
     }
