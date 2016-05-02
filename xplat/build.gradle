@@ -1,8 +1,15 @@
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceSets {
     main {
         java.srcDirs = ['src/main/java', new File(project(':synccore').rootDir, "synccore/src/main/java")]
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'insync.syncnote.SyncNoteApplication'
     }
 }
 

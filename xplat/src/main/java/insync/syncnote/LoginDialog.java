@@ -63,7 +63,9 @@ public class LoginDialog extends JDialog {
                         SyncNoteCore.getInst().getConfig().setAuthToken(token);
                         titleText.setForeground(Color.GREEN);
                         titleText.setText("Logged in successfully!");
-                        parent.activeWindows.get(0).triggerDownload();
+                        if (!parent.activeWindows.isEmpty()) {
+                            parent.activeWindows.get(0).triggerDownload();
+                        }
                         closeGracefully();
                     }
                 });
@@ -101,7 +103,9 @@ public class LoginDialog extends JDialog {
                         titleText.setForeground(Color.GREEN);
                         titleText.setText("Registered and logged in successfully!");
                         closeGracefully();
-                        parent.activeWindows.get(0).triggerDownload();
+                        if (!parent.activeWindows.isEmpty()) {
+                            parent.activeWindows.get(0).triggerDownload();
+                        }
                     }
                 });
             } else {

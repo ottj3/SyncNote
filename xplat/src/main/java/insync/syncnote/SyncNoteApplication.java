@@ -163,7 +163,10 @@ public class SyncNoteApplication {
                 InputStreamReader reader = new InputStreamReader(fis);
                 SyncNoteCore.getInst().setConfig(gson.fromJson(reader, CoreConfig.class));
                 fis.close();
-            } else {
+            }/* else {
+                // NOTE this else block isn't actually necessary because the Gson serializer
+                // will create a valid settings file out of our CoreConfig class already
+
                 // otherwise, load it from the internal resource
                 InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
                 if (is == null) {
@@ -179,7 +182,8 @@ public class SyncNoteApplication {
                 }
                 fos.close();
                 is.close();
-            }
+
+            }*/
         } catch (IOException e) {
             e.printStackTrace();
         }
