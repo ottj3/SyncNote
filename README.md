@@ -26,7 +26,7 @@ Notes will be saved automatically, but at the moment the user must manually pres
 ## Compiling
 
 ### Java
-The Java portion of the project can be compiled by running the gradle build script. If you do not have a local installation of gradle, a wrapper script is included. To compile the entire thing (see Android notes below), run ```./gradlew build``` (or ```./gradlew.bat``` for Windows systems). To compile without the Android portion, run ```./gradlew :xplat:build```. The output files will be in the ```xplat/build``` folder. The jar file there should be runnable out of the box.
+The Java portion of the project can be compiled by running the gradle build script. If you do not have a local installation of gradle, a wrapper script is included. To compile the entire thing (see Android notes below), run ```./gradlew build``` (or ```./gradlew.bat``` for Windows systems). To compile without the Android portion, run ```./gradlew :xplat:build```. The output files will be in the ```xplat/build/libs``` folder. The jar file there should be runnable out of the box.
 Additionally, the project can be imported into any IDE that supports gradle by importing the build.gradle file in the root directory. This should also import and configure the subprojects for each portion.
 
 #### Android
