@@ -9,6 +9,7 @@ Final project for CSC 470-01: HCI, Spring 2016. By Connor Davis, Jan-Lucas Ott, 
   * [Android](#android)
   * [iOS](#ios)
 * [Server](#server)
+* [Development](#development)
 
 ## About
 SyncNote is a cross-platform application meant to ease note-taking tasks for users across multiple devices. It allows the user to take notes on any compatible device, and have them sync automatically to their other devices.
@@ -41,3 +42,42 @@ Import the ```SyncNote.xcodeproj``` file from the ```iOS``` folder into XCode.
 The server-side which handles users and stores notes is written completely in a few php scripts. If you wish to test or develop these yourself, you will need any HTTP server with PHP installed and configured, or run the php interpreter in server mode (```php -S localhost:80```, for example).
 The "official" production server is currently hosted in our TCNJ webspace, and the application should connect there automatically. To connect to a test server instead, you must use the Java application and run with ```-Dsyncnote.server=<url>```.
 One php script, namely ```debug.php```, is just for testing purposes and not required by SyncNote at all.
+
+## Development
+This section is meant to provide a brief overview of the (Java) codebase and its inner workings.
+
+The heart of SyncNote is the ```SyncNoteCore``` class, which creates a Singleton instance when loaded on any platform.
+This instance provides the platform-specific code bases access to three main components:
+* Manager: The manager stores all the loaded notes in a Map, keyed by the notes' id (title). It provides methods to get, set, and remove notes individually, as well as methods to get a list of all notes and to clear the database.
+* NoteParser: This is a small utility class that uses Google's Gson library to convert between the JSON format of notes stored by the server and the Manager class. It can encode the contents of the Manager to JSON, and decode JSON automatically filling the Manager.
+* CoreConfig: The config holds various session variables for ease of access, such as the authentication token. It is meant to be extensible, and can be extended by each implementation of SyncNote as needed (e.g. the Android app could create a AndroidCoreConfig class) and then override the default via the SyncNoteCore#setConfig method.
+
+Additionally, there are a few more classes of *note*:
+* Note: Provides a basic data structure for notes. In the current spec, this is just a String used as the title, and a String for the text body. This class is primarily for future usability, in case formatting, metadata, revisions, etc are to be added, that can be done without breaking existing code.
+* HTTPTasks: Provides static methods for interfacing with the server. While it is never called from within the core SyncNoteCode, it exists to standardize the network protocol between implementations of SyncNote.
+  * Constants: This class provides the server url as a constant, and allows overriding it for [testing](#server). It may hold other constant variables in the future.
+* Exceptions: The classes in the exceptions package serve to create more passable errors between the HTTPTasks and NoteParser classes and whatever implementation may be calling them. In general, InvalidRequest maps to a HTTP 400 response, Forbidden to a 403, and InvalidNotes is from a JSON exception.
+
+#### Swing Implementation
+
+The implementation of SyncNote designed for PC use (Windows, Mac, Linux) uses the Java Swing UI toolkit.
+
+The main (entry) class is SyncNoteApplication. It has two main purposes: loading/saving configuration, and managing windows.
+
+Configuration is done by creating a ```settings.json``` file and (de)serializing the CoreConfig class mentioned earlier with Gson.
+
+To manage windows, the Application creates a monitor thread that will wait for all Note windows to be closed, at which point it will save the configuration to disk and exit.
+It also can ask a user to login, or log them in automatically, using a dialog (```LoginDialog```), depending on if a settings file exists already. It then opens either a blank window, or opens the user's last open note, and starts the monitor thread and waits.
+
+The interface is composed of ```NoteWindows```s, which provide the basic note interface and functionality. Each window is initialized with various buttons, whose functionality is, in line with Swing design principles, composed of a lengthy series of closures and anonymous classes.
+
+Two classes were separated from these: DragPanel, which allows the user to drag the note windows around since NoteWindows are undecorated by the OS, was extracted for reusability, and ComponentResizer, which allows resizing windows by listening to mouse clicks on Frame borders,
+which was kept separate as it is a class originally written by Rob Camick for his blog. See the file for details.
+
+The heart of each NoteWindow is the ```noteIdPane``` and ```textEditorPane```, which the user actually uses to edit notes. Each NoteWindow periodically checks for changes and saves them to SyncNoteCore's Manager class for tracking (including adding and deleting notes). It also exposes these two
+via the methods ```#showNote```, ```#getCurrentNoteId``` and ```#setTextBox``` to allow other windows to change the contents of a window (for example, when logging out).
+
+Additionally, the NoteWindow has a button that can open the SettingsWindow, which provides (very basic) functionality for changing SyncNote settings.
+At the moment, this is limited to
+* logging out (if the user is logged in) or logging in/registering (if logged out) (using LoginDialog again)
+* listing all notes the user has, even those not open in windows, and allowing the user to open notes or delete notes en masse

@@ -57,14 +57,17 @@ public class NoteWindow extends JFrame {
         init();
     }
 
+    // get the id of the note currently being displayed, if there is one
     public String getCurrentNoteId() {
         return noteIdPane.getText();
     }
 
+    // set the text to be displayed in the text box. this will not trigger a save
     public void setTextBox(String text) {
         textEditorPane.setText(text);
     }
 
+    // close the window, updating the parent class and firing swing events
     public void close() {
         // make sure we always save before closing
         saveCurrentNote();
@@ -73,6 +76,7 @@ public class NoteWindow extends JFrame {
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
 
+    // hack to allow other windows to sync with the server. should be moved to the main class eventually
     public void triggerDownload() {
         download();
     }
@@ -248,6 +252,7 @@ public class NoteWindow extends JFrame {
         updateTask.start();
     }
 
+    // re-style all our buttons in creation
     private JButton createButton(String name, String toolTip) {
         JButton btn = new JButton(name);
         btn.setToolTipText(toolTip);
@@ -257,6 +262,7 @@ public class NoteWindow extends JFrame {
         return btn;
     }
 
+    // creates the layout
     private void setupUI(JComponent[] titlePane, JComponent[] notePane, JComponent textBox) {
         JPanel main = new JPanel(new BorderLayout());
         main.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -303,6 +309,11 @@ public class NoteWindow extends JFrame {
 
         this.pack();
     }
+
+    // ====================================================
+    // methods triggered by all the various button closures
+    // that aren't done via anonymous classes already
+    // ====================================================
 
     private void saveCurrentNote() {
         if (noteIdPane.getText().isEmpty()) return; // don't save notes without a title

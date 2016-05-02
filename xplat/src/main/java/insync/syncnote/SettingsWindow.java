@@ -52,6 +52,7 @@ public class SettingsWindow extends JFrame {
         JTabbedPane tabs = new JTabbedPane();
         tabs.setBackground(CANARY);
 
+        // "account" tab
         JPanel cardAccount = new JPanel();
         cardAccount.setLayout(new BorderLayout());
         JLabel logLabel;
@@ -71,9 +72,11 @@ public class SettingsWindow extends JFrame {
         cardAccount.add(logBtn, BorderLayout.SOUTH);
         cardAccount.setMaximumSize(new Dimension(200, 200));
 
+        // "notes" tab
         JPanel cardNotes = new JPanel();
         cardNotes.setLayout(new BorderLayout());
         cardNotes.setToolTipText("Click to open note, or use checkboxes and buttons below.");
+        // get notes data from core
         List<Note> namesList = SyncNoteCore.getInst().getManager().getAllNotes();
         Object[][] data = new Object[namesList.size()][2];
         for (int i = 0; i < namesList.size(); i++) {
@@ -81,6 +84,7 @@ public class SettingsWindow extends JFrame {
             data[i][1] = namesList.get(i).getId();
         }
         String[] columns = {"", "Note Title"};
+        // gives us completely control over our table layout and columns
         JTable notesList = new JTable(new AbstractTableModel() {
             @Override
             public String getColumnName(int col) {
@@ -129,6 +133,7 @@ public class SettingsWindow extends JFrame {
         notesList.setFillsViewportHeight(true);
         JScrollPane notesScroll = new JScrollPane(notesList);
         cardNotes.add(notesScroll, BorderLayout.CENTER);
+
         JPanel notesButtons = new JPanel(new GridLayout(1, 2));
         JButton openSelected = createButton("Open Notes", "Open all selected notes in new windows.");
         JButton deleteSelected = createButton("Delete Notes", "Delete all currently selected notes.");
@@ -163,6 +168,7 @@ public class SettingsWindow extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
+    // same as NoteWindow. should be put in a utility class somewhere
     private JButton createButton(String name, String toolTip) {
         JButton btn = new JButton(name);
         btn.setToolTipText(toolTip);
@@ -171,6 +177,10 @@ public class SettingsWindow extends JFrame {
         btn.setBorderPainted(false);
         return btn;
     }
+
+    // ==============
+    // button methods
+    // ==============
 
     private void login() {
         if (SyncNoteCore.getInst().getConfig().getAuthToken().isEmpty()) {

@@ -24,6 +24,10 @@ import javax.swing.Timer;
 import insync.syncnote.exceptions.RequestForbiddenException;
 import insync.syncnote.exceptions.RequestInvalidException;
 
+/**
+ * Prompts user to login with username/password, or allows them to register.
+ * User can also chose to work in offline mode.
+ */
 public class LoginDialog extends JDialog {
 
     private final SyncNoteApplication parent;
