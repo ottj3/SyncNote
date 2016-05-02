@@ -22,29 +22,30 @@ public class SyncNoteAppDemo extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
     }
+    //Creates the options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
+    //Determines what option is selected and handles accordingly
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        //Takes to MainActivity2 menu
         if (item.getItemId() == R.id.action_menu)
         {
             Intent intent = new Intent(this, MainActivity2.class);
             this.startActivity(intent);
             return super.onOptionsItemSelected(item);
         }
+        //Upload message to authority token. Does not work if authority token is invalid
         if (item.getItemId() == R.id.syncUp)
         {
             EditText syncText = (EditText) findViewById(R.id.syncText);
-            EditText syncKey = (EditText) findViewById(R.id.syncKey);
-//            if (syncKey == null || syncText == null) return false;
             String text = syncText.getText().toString();
-            String key = syncKey.getText().toString();
+            String key = SyncNoteCore.getInst().getConfig().getAuthToken();
             try {
                 HTTPTasks.uploadText(key, text);
             } catch (RequestForbiddenException e) {
@@ -54,12 +55,11 @@ public class SyncNoteAppDemo extends AppCompatActivity {
             }
             return true;
         }
+        //Download message from authority token. Does not work if authority token is invalid
         if (item.getItemId() == R.id.syncDown)
         {
             EditText syncText = (EditText) findViewById(R.id.syncText);
-            EditText syncKey = (EditText) findViewById(R.id.syncKey);
-//            if (syncKey == null || syncText == null) return false;
-            String key = syncKey.getText().toString();
+            String key = SyncNoteCore.getInst().getConfig().getAuthToken();
             String text = null;
             try {
                 text = HTTPTasks.downloadText(key);
@@ -74,37 +74,4 @@ public class SyncNoteAppDemo extends AppCompatActivity {
         }
         return true;
     }
-
-//    public void clickUp(View view) {
-//        EditText syncText = (EditText) findViewById(R.id.syncText);
-//        EditText syncKey = (EditText) findViewById(R.id.syncKey);
-//        if (syncKey == null || syncText == null) return;
-//        String text = syncText.getText().toString();
-//        String key = syncKey.getText().toString();
-//        try {
-//            HTTPTasks.uploadText(key, text);
-//        } catch (RequestForbiddenException e) {
-//            e.printStackTrace();
-//        } catch (RequestInvalidException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void clickDown(View view) {
-//        EditText syncText = (EditText) findViewById(R.id.syncText);
-//        EditText syncKey = (EditText) findViewById(R.id.syncKey);
-//        if (syncKey == null || syncText == null) return;
-//        String key = syncKey.getText().toString();
-//        String text = null;
-//        try {
-//            text = HTTPTasks.downloadText(key);
-//        } catch (RequestForbiddenException e) {
-//            e.printStackTrace();
-//        } catch (RequestInvalidException e) {
-//            e.printStackTrace();
-//        }
-//        syncText.getText().clear();
-//        syncText.getText().append(text);
-//    }
-
 }

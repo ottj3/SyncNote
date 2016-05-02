@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Notes extends AppCompatActivity {
+    //Does nothing as of yet.
     ListView mListView;
     @Override
     protected void onCreate(Bundle savedInstanceState)

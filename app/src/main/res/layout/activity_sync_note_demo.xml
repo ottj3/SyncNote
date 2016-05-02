@@ -34,7 +34,6 @@
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="571e5d385897f"
         android:id="@+id/syncKey"
         android:layout_alignParentBottom="true"/>
 

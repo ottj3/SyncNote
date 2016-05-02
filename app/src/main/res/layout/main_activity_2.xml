@@ -5,10 +5,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     tools:context=".MainActivity2">
-
+    //Creates the list view, items are added in MainActivity2.java
     <ListView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/listView"
-        android:layout_weight="1" />
+        android:layout_weight="1"/>
 </LinearLayout>
