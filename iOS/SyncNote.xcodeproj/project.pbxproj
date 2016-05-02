@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D446A7921CD2793E00BD8E5E /* NotesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D446A7911CD2793E00BD8E5E /* NotesTableViewCell.swift */; };
-		D446A7941CD27D1200BD8E5E /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D446A7931CD27D1200BD8E5E /* ListViewController.swift */; };
 		D4BDFAEC1CC7F6A1001F2D8B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BDFAEB1CC7F6A1001F2D8B /* AppDelegate.swift */; };
 		D4BDFAEE1CC7F6A1001F2D8B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BDFAED1CC7F6A1001F2D8B /* ViewController.swift */; };
 		D4BDFAF11CC7F6A1001F2D8B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4BDFAEF1CC7F6A1001F2D8B /* Main.storyboard */; };
@@ -29,8 +27,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		D446A7911CD2793E00BD8E5E /* NotesTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NotesTableViewCell.swift; path = ../NotesTableViewCell.swift; sourceTree = "<group>"; };
-		D446A7931CD27D1200BD8E5E /* ListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		D4BDFAE61CC7F6A1001F2D8B /* SyncNote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SyncNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4BDFAEA1CC7F6A1001F2D8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4BDFAEB1CC7F6A1001F2D8B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -90,8 +86,6 @@
 				D4BDFAF41CC7F6A2001F2D8B /* LaunchScreen.xib */,
 				D4BDFAE91CC7F6A1001F2D8B /* Supporting Files */,
 				D4BDFB0B1CC81104001F2D8B /* LoggedInViewController.swift */,
-				D446A7911CD2793E00BD8E5E /* NotesTableViewCell.swift */,
-				D446A7931CD27D1200BD8E5E /* ListViewController.swift */,
 			);
 			path = SyncNote;
 			sourceTree = "<group>";
@@ -224,8 +218,6 @@
 				D4BDFB0C1CC81104001F2D8B /* LoggedInViewController.swift in Sources */,
 				D4BDFAEE1CC7F6A1001F2D8B /* ViewController.swift in Sources */,
 				D4BDFAEC1CC7F6A1001F2D8B /* AppDelegate.swift in Sources */,
-				D446A7941CD27D1200BD8E5E /* ListViewController.swift in Sources */,
-				D446A7921CD2793E00BD8E5E /* NotesTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
