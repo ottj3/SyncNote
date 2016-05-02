@@ -25,7 +25,6 @@ public class SyncNoteApplication {
 
     final List<NoteWindow> activeWindows = new ArrayList<>();
     private final Object lock = new Object();
-    SettingsWindow settingsWindow = null;
 
     public static void main(String[] args) {
         // create main instance of our application
@@ -104,7 +103,7 @@ public class SyncNoteApplication {
         Thread t = new Thread(() -> {
             //System.out.println("Running thread");
             synchronized (main.lock) {
-                while (!main.activeWindows.isEmpty() || (main.settingsWindow != null)) {
+                while (!main.activeWindows.isEmpty()) {
                     try {
                         // if there are still open windows, wait until we get a notify() from above
                         //System.out.println("Wait starting");

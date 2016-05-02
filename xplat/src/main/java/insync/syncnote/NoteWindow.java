@@ -10,6 +10,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -48,6 +49,14 @@ public class NoteWindow extends JFrame {
     public NoteWindow(SyncNoteApplication parent) {
         this.parentApp = parent;
         init();
+    }
+
+    public String getCurrentNoteId() {
+        return noteIdPane.getText();
+    }
+
+    public void setTextBox(String text) {
+        textEditorPane.setText(text);
     }
 
     public void close() {
@@ -214,10 +223,18 @@ public class NoteWindow extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (parentApp.activeWindows.size() > 1) {
-                    SyncNoteCore.getInst().getConfig().getOpenNotes().remove(noteIdPane.getText());
-                }
                 parentApp.activeWindows.remove(NoteWindow.this);
+                // update open windows
+                List<String> open = new ArrayList<>();
+                for (NoteWindow noteWindow : parentApp.activeWindows) {
+                    String s = noteWindow.getCurrentNoteId();
+                    if (!s.isEmpty()) open.add(s);
+                }
+                if (parentApp.activeWindows.size() == 0) {
+                    String s = getCurrentNoteId();
+                    if (!s.isEmpty()) open.add(s);
+                }
+                SyncNoteCore.getInst().getConfig().setOpenNotes(open);
                 parentApp.notifyLock();
             }
         });
@@ -441,22 +458,8 @@ public class NoteWindow extends JFrame {
     }
 
     private void openSettings() {
-        // TODO full settings menu, not just login
-        if (SyncNoteCore.getInst().getConfig().getAuthToken().isEmpty()) {
-            EventQueue.invokeLater(() -> {
-                LoginDialog login = new LoginDialog(parentApp);
-                login.setVisible(true);
-            });
-        } else {
-            // logout
-            upload();
-            SyncNoteCore.getInst().getManager().removeAll();
-            SyncNoteCore.getInst().getConfig().setAuthToken("");
-            Note n = new Note("Logged Out", "You are logged out.\nNotes you write now will not be synced.");
-            for (NoteWindow win : parentApp.activeWindows) {
-                win.showNote(n);
-            }
-        }
+        SettingsWindow window = new SettingsWindow(parentApp);
+        EventQueue.invokeLater(() -> window.setVisible(true));
     }
 
 }
