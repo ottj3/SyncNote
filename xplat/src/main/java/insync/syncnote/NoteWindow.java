@@ -27,6 +27,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicScrollBarUI;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import insync.syncnote.exceptions.InvalidNotesFileException;
 import insync.syncnote.exceptions.RequestForbiddenException;
@@ -50,6 +53,8 @@ public class NoteWindow extends JFrame {
     public void close() {
         // make sure we always save before closing
         saveCurrentNote();
+
+        // throw closing event, allowing Swing to do its thing
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
 
@@ -76,8 +81,8 @@ public class NoteWindow extends JFrame {
             parentApp.activeWindows.add(newWindow);
         }));
 
-        JButton uploadButton = createButton("U", "Upload all your notes to the server."); // "upload"
-        JButton downloadButton = createButton("D", "Download all your notes from the server."); // "download"
+        JButton uploadButton = createButton("\u21e7", "Upload all your notes to the server."); // "upload"
+        JButton downloadButton = createButton("\u21e9", "Download all your notes from the server."); // "download"
         uploadButton.addActionListener(e -> upload());
         downloadButton.addActionListener(e -> download());
 
@@ -86,8 +91,8 @@ public class NoteWindow extends JFrame {
         settingsButton.addActionListener(e -> openSettings());
         deleteButton.addActionListener(e -> deleteNote());
 
-        prevNote = createButton("<", "View the previous note.");
-        nextNote = createButton(">", "View the next note.");
+        prevNote = createButton("\u21e6", "View the previous note.");
+        nextNote = createButton("\u21e8", "View the next note.");
         prevNote.addActionListener(e -> prevNote());
         nextNote.addActionListener(e -> nextNote());
 
@@ -101,6 +106,13 @@ public class NoteWindow extends JFrame {
 
         textEditorPane = new JEditorPane();
         noteIdPane = new JTextPane();
+
+        // center the note title...yes this is all necessary
+        StyledDocument doc = noteIdPane.getStyledDocument();
+        SimpleAttributeSet center = new SimpleAttributeSet();
+        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+        doc.setParagraphAttributes(0, doc.getLength(), center, false);
+
         noteIdPane.setBackground(CANARY);
         textEditorPane.setBackground(CANARY);
 
@@ -143,8 +155,8 @@ public class NoteWindow extends JFrame {
         JComponent[] notePane = new JComponent[]{ // second bar of buttons
                 prevNote,
                 noteIdPane,
-                nextNote,
                 deleteButton,
+                nextNote,
         };
 
 
@@ -181,11 +193,12 @@ public class NoteWindow extends JFrame {
 
         });
 
+        // remove default borders and buttons
+        setUndecorated(true);
         // put all the buttons and stuff in place
         setupUI(titlePane, notePane, textPane);
 
         // set up the window itself
-        setUndecorated(true);
         setTitle("SyncNote");
         setSize(300, 200);
         setLocationRelativeTo(null);
@@ -201,6 +214,9 @@ public class NoteWindow extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                if (parentApp.activeWindows.size() > 1) {
+                    SyncNoteCore.getInst().getConfig().getOpenNotes().remove(noteIdPane.getText());
+                }
                 parentApp.activeWindows.remove(NoteWindow.this);
                 parentApp.notifyLock();
             }
@@ -282,6 +298,12 @@ public class NoteWindow extends JFrame {
         saveCurrentNote();
         List<Note> notes = SyncNoteCore.getInst().getManager().getAllNotes();
         String curr = noteIdPane.getText(); // we store the current note
+        if (curr.isEmpty()) {
+            // show first
+            Note note = notes.get(0);
+            if (note != null) showNote(note);
+            return;
+        }
         if (notes.size() > 1) {
             // check for the previous note by iterating through all notes
             prevNote.setForeground(Color.BLACK);
@@ -311,14 +333,19 @@ public class NoteWindow extends JFrame {
         List<Note> notes = SyncNoteCore.getInst().getManager().getAllNotes();
         // this works just like the last one, except we store a boolean for "next"
         // instead of storing the Note object for "previous"
+        String curr = noteIdPane.getText();
+        if (curr.isEmpty()) {
+            Note note = notes.get(0);
+            if (note != null) showNote(note);
+            return;
+        }
         if (notes.size() > 1) {
             prevNote.setForeground(Color.BLACK);
             nextNote.setForeground(Color.BLACK);
             boolean next = false;
-            String curr = noteIdPane.getText();
             for (Note n : notes) {
                 if (!next) {
-                    if (n.getId().equals(curr) || curr.isEmpty()) {
+                    if (n.getId().equals(curr)) {
                         next = true;
                     }
                 } else {
@@ -425,8 +452,10 @@ public class NoteWindow extends JFrame {
             upload();
             SyncNoteCore.getInst().getManager().removeAll();
             SyncNoteCore.getInst().getConfig().setAuthToken("");
-            noteIdPane.setText("");
-            textEditorPane.setText("You are logged out. Notes you write now will not be synced.");
+            Note n = new Note("Logged Out", "You are logged out.\nNotes you write now will not be synced.");
+            for (NoteWindow win : parentApp.activeWindows) {
+                win.showNote(n);
+            }
         }
     }
 

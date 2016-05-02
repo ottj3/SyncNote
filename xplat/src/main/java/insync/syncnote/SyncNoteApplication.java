@@ -3,13 +3,14 @@ package insync.syncnote;
 import com.google.gson.Gson;
 
 import java.awt.EventQueue;
+import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +23,9 @@ import insync.syncnote.exceptions.RequestInvalidException;
 
 public class SyncNoteApplication {
 
+    final List<NoteWindow> activeWindows = new ArrayList<>();
     private final Object lock = new Object();
-    public void notifyLock() {
-        synchronized (lock) {
-            // this notifies the wait() below, in case the caller of this method
-            // was the last window to close (which will get checked anyway)
-            lock.notify();
-        }
-    }
+    SettingsWindow settingsWindow = null;
 
     public static void main(String[] args) {
         // create main instance of our application
@@ -43,8 +39,10 @@ public class SyncNoteApplication {
         if (!config.isOffline() && config.getAuthToken().isEmpty()) {
             // first time login
             LoginDialog login = new LoginDialog(main);
-            EventQueue.invokeLater(() -> login.setVisible(true));
-        } else if (!config.getAuthToken().isEmpty()) {
+            login.setModal(true);
+            login.setVisible(true);
+        }
+        if (!config.getAuthToken().isEmpty()) {
             // if they ARE logged in already, fetch their notes
             try {
                 Thread dl = new Thread(() -> {
@@ -58,7 +56,7 @@ public class SyncNoteApplication {
                         EventQueue.invokeLater(() -> login.setVisible(true));
                     } catch (InvalidNotesFileException e2) {
                         JOptionPane.showMessageDialog(new JFrame(), "Tried to get your notes from "
-                                + "the server, but the file was corrupted.",
+                                        + "the server, but the file was corrupted.",
                                 "Error Downloading", JOptionPane.ERROR_MESSAGE);
                     } catch (RequestInvalidException ignored) {
                     }
@@ -73,7 +71,9 @@ public class SyncNoteApplication {
         // if the user had notes open last time they quit, re-open those all in windows
         if (!config.getOpenNotes().isEmpty()) {
             List<String> setLater = new ArrayList<>();
-            config.getOpenNotes().forEach(s -> {
+            int offset = 30;
+            for (int i = 0; i < config.getOpenNotes().size(); i++) {
+                String s = config.getOpenNotes().get(i);
                 Note note = SyncNoteCore.getInst().getManager().get(s);
                 if (note == null) {
                     // had a note open that's gone now, remove it
@@ -82,9 +82,11 @@ public class SyncNoteApplication {
                 setLater.add(s);
                 NoteWindow window = new NoteWindow(main);
                 window.showNote(note);
+                Point start = window.getLocation();
+                window.setLocation(start.x + i * offset, start.y + i * offset);
                 EventQueue.invokeLater(() -> window.setVisible(true));
                 main.activeWindows.add(window);
-            });
+            }
             config.setOpenNotes(setLater);
         }
         // if we failed to create windows above (if we got logged out or notes are missing,
@@ -132,8 +134,13 @@ public class SyncNoteApplication {
         System.exit(0);
     }
 
-    final List<NoteWindow> activeWindows = new ArrayList<>();
-    SettingsWindow settingsWindow = null;
+    public void notifyLock() {
+        synchronized (lock) {
+            // this notifies the wait() below, in case the caller of this method
+            // was the last window to close (which will get checked anyway)
+            lock.notify();
+        }
+    }
 
     public void saveConfig(String fileName) {
         File configFile = new File(fileName);
